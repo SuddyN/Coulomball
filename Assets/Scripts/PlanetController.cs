@@ -13,10 +13,11 @@ public class PlanetController: MonoBehaviour {
     public void UpdateCharge(float charge) {
         this.charge = charge;
         spriteRenderer.color = charge > 0 ? Color.Lerp(Color.white, positiveColor, charge / 15) : Color.Lerp(negativeColor, Color.white, charge / 15);
+        GameManager.FieldManager.UpdateField();
     }
 
     private void Start() {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        UpdateCharge(this.charge);
+        spriteRenderer.color = charge > 0 ? Color.Lerp(Color.white, positiveColor, charge / 15) : Color.Lerp(negativeColor, Color.white, charge / 15);
     }
 }

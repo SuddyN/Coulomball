@@ -4,29 +4,25 @@ using UnityEngine;
 
 public class PinballController: MonoBehaviour {
     public float charge;
-    public float coulombConstant;
     public float maxDist;
-    private GameObject[] planets;
     private Rigidbody2D _rigidbody2D;
 
     private void Start() {
-        planets = GameObject.FindGameObjectsWithTag("Planet");
         _rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
     }
 
     private void Update() {
-        foreach (GameObject planet in planets) {
-            PlanetController planetController = planet.GetComponent<PlanetController>();
+        foreach (PlanetController planetController in GameManager.Instance.planetControllers) {
             if (!planetController.chargeEnabled) {
                 continue;
             }
-            Vector2 diff = planet.transform.position - transform.position;
+            Vector2 diff = planetController.transform.position - transform.position;
             float dist = diff.magnitude;
             if (dist > maxDist) {
                 continue;
             }
             // F = kQ_1Q_2/r^2
-            _rigidbody2D.AddForce(diff.normalized * (coulombConstant * charge * planetController.charge / (dist * dist)));
+            _rigidbody2D.AddForce(GameManager.calculateForce(GameManager.Instance.coulombConstant, charge, planetController.charge, diff));
         }
     }
 
