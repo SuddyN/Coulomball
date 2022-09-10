@@ -7,6 +7,7 @@ public class InputManager: MonoBehaviour {
 
     public InputAction leftFlipperAction;
     public InputAction rightFlipperAction;
+    public InputAction pauseAction;
     public float minFlipperRotation = -10;
     public float maxFlipperRotation = 30;
     public float flipperSpeed = 50;
@@ -14,16 +15,18 @@ public class InputManager: MonoBehaviour {
     private void OnEnable() {
         leftFlipperAction.Enable();
         rightFlipperAction.Enable();
+        pauseAction.Enable();
     }
 
     private void OnDisable() {
         leftFlipperAction.Disable();
         rightFlipperAction.Disable();
+        pauseAction.Disable();
     }
 
-    void Update() {
-        bool isLeftPressed = leftFlipperAction.ReadValue<float>() > 0;
-        bool isRightPressed = rightFlipperAction.ReadValue<float>() > 0;
+    private void ControllGame() {
+        bool isLeftPressed = leftFlipperAction.IsPressed();
+        bool isRightPressed = rightFlipperAction.IsPressed();
         var leftRB = GameManager.Instance.leftFlipper.GetComponent<Rigidbody2D>();
         var rightRB = GameManager.Instance.rightFlipper.GetComponent<Rigidbody2D>();
 
@@ -47,5 +50,21 @@ public class InputManager: MonoBehaviour {
         }
         rightRB.rotation = (-(rightRB.rotation - 180) > maxFlipperRotation) ? -(maxFlipperRotation - 180) : rightRB.rotation;
         rightRB.rotation = (-(rightRB.rotation - 180) < minFlipperRotation) ? -(minFlipperRotation - 180) : rightRB.rotation;
+    }
+
+    void Update() {
+        if (GameManager.Instance.state == GameManager.GameState.Playing) {
+            ControllGame();
+            if (pauseAction.WasPressedThisFrame()) {
+                Debug.Log("paused");
+                GameManager.Instance.state = GameManager.GameState.Menu;
+                Time.timeScale = 0;
+            }
+        } else if (GameManager.Instance.state == GameManager.GameState.Menu) {
+            if (pauseAction.WasPressedThisFrame()) {
+                GameManager.Instance.state = GameManager.GameState.Playing;
+                Time.timeScale = 1;
+            }
+        }
     }
 }
