@@ -123,7 +123,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &2512019272130306952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,5 +137,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   charge: 1
-  coulombConstant: -0.05
   maxDist: 50
+  positiveColor: {r: 1, g: 0.16078432, b: 0.16078432, a: 1}
+  negativeColor: {r: 0.12941177, g: 0.12941177, b: 1, a: 1}

@@ -48,6 +48,8 @@ public class GameManager: MonoBehaviour {
     public int startLives;
     public TextMeshProUGUI livesText;
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI messageText;
+    public GameObject game;
 
     public enum GameState {
         Playing, Menu
@@ -69,14 +71,20 @@ public class GameManager: MonoBehaviour {
         Time.timeScale = 1;
     }
 
-    public void UpdateScore(int newScore) {
+    public void SetScore(int newScore) {
         score = newScore;
         scoreText.text = "Score: " + newScore;
     }
 
-    public void UpdateLives(int newLives) {
+    public void SetLives(int newLives) {
         lives = newLives;
         livesText.text = "Lives: " + newLives;
+        if (newLives <= 0) {
+            Time.timeScale = 0;
+            state = GameState.Menu;
+            messageText.text = "Press Esc to Continue";
+            game.SetActive(false);
+        }
     }
 
     private void Awake() {
@@ -84,22 +92,14 @@ public class GameManager: MonoBehaviour {
         _instance = this;
         _inputManager = gameObject.GetComponent<InputManager>();
         _fieldManager = gameObject.GetComponent<FieldManager>();
-        UpdateLives(startLives);
-        UpdateScore(0);
+        SetLives(startLives);
+        SetScore(0);
+        messageText.text = "";
 
         GameObject[] planets = GameObject.FindGameObjectsWithTag("Planet");
         planetControllers = new PlanetController[planets.Length];
         for (int i = 0; i < planets.Length; i++) {
             planetControllers[i] = planets[i].GetComponent<PlanetController>();
-        }
-    }
-
-    private void Update() {
-        if (lives <= 0) {
-            Time.timeScale = 0;
-            state = GameState.Menu;
-            UpdateLives(startLives);
-            UpdateScore(0);
         }
     }
 }

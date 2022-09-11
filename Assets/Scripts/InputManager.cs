@@ -30,38 +30,57 @@ public class InputManager: MonoBehaviour {
         var leftRB = GameManager.Instance.leftFlipper.GetComponent<Rigidbody2D>();
         var rightRB = GameManager.Instance.rightFlipper.GetComponent<Rigidbody2D>();
 
-        if ((isLeftPressed && leftRB.rotation < maxFlipperRotation) || leftRB.rotation < minFlipperRotation) {
+        if (isLeftPressed && leftRB.rotation < maxFlipperRotation) {
             leftRB.angularVelocity = flipperSpeed * (maxFlipperRotation - leftRB.rotation);
-        } else if ((!isLeftPressed && leftRB.rotation > minFlipperRotation) || leftRB.rotation > maxFlipperRotation) {
+        } else if (!isLeftPressed && leftRB.rotation > minFlipperRotation) {
             leftRB.angularVelocity = -(flipperSpeed * (leftRB.rotation - minFlipperRotation));
         } else {
             leftRB.angularVelocity = 0;
         }
 
-        leftRB.rotation = (leftRB.rotation > maxFlipperRotation) ? maxFlipperRotation : leftRB.rotation;
-        leftRB.rotation = (leftRB.rotation < minFlipperRotation) ? minFlipperRotation : leftRB.rotation;
+        if (leftRB.rotation > maxFlipperRotation) {
+            leftRB.rotation = maxFlipperRotation - 1;
+            leftRB.angularVelocity = 0;
+        }
+        if (leftRB.rotation < minFlipperRotation) {
+            leftRB.rotation = minFlipperRotation;
+            leftRB.angularVelocity = 0;
+        }
 
-        if ((isRightPressed && -(rightRB.rotation - 180) < maxFlipperRotation) || -(rightRB.rotation - 180) < minFlipperRotation) {
+        if (isRightPressed && -(rightRB.rotation - 180) < maxFlipperRotation) {
             rightRB.angularVelocity = -(flipperSpeed * (maxFlipperRotation - -(rightRB.rotation - 180)));
-        } else if ((!isRightPressed && -(rightRB.rotation - 180) > minFlipperRotation) || -(rightRB.rotation - 180) > maxFlipperRotation) {
+        } else if (!isRightPressed && -(rightRB.rotation - 180) > minFlipperRotation) {
             rightRB.angularVelocity = flipperSpeed * (-(rightRB.rotation - 180) - minFlipperRotation);
         } else {
             rightRB.angularVelocity = 0;
         }
-        rightRB.rotation = (-(rightRB.rotation - 180) > maxFlipperRotation) ? -(maxFlipperRotation - 180) : rightRB.rotation;
-        rightRB.rotation = (-(rightRB.rotation - 180) < minFlipperRotation) ? -(minFlipperRotation - 180) : rightRB.rotation;
+
+        if (-(rightRB.rotation - 180) > maxFlipperRotation) {
+            rightRB.rotation = -(maxFlipperRotation - 181);
+            rightRB.angularVelocity = 0;
+        }
+        if (-(rightRB.rotation - 180) < minFlipperRotation) {
+            rightRB.rotation = -(minFlipperRotation - 180);
+            rightRB.angularVelocity = 0;
+        }
     }
 
     void Update() {
         if (GameManager.Instance.state == GameManager.GameState.Playing) {
             ControllGame();
             if (pauseAction.WasPressedThisFrame()) {
-                Debug.Log("paused");
+                GameManager.Instance.messageText.text = "Press Esc to Continue";
                 GameManager.Instance.state = GameManager.GameState.Menu;
                 Time.timeScale = 0;
             }
         } else if (GameManager.Instance.state == GameManager.GameState.Menu) {
             if (pauseAction.WasPressedThisFrame()) {
+                GameManager.Instance.messageText.text = "";
+                if (GameManager.Instance.lives <= 0) {
+                    GameManager.Instance.game.SetActive(true);
+                    GameManager.Instance.SetLives(GameManager.Instance.startLives);
+                    GameManager.Instance.SetScore(0);
+                }
                 GameManager.Instance.state = GameManager.GameState.Playing;
                 Time.timeScale = 1;
             }
